@@ -46,7 +46,7 @@ class PolynomialRegression():
             y_pred = self.predict(x, preproc = False)
             self.errors.append(mse(y, y_pred))
             
-            # check if relative change in error is less than rel_stop
+            # check if relative change in error is less than rel_stop -> converged
             # or check if error is increasing -> learning rate too high
             if i > 1:
                 rel_error = abs(self.errors[-2] - self.errors[-1])/self.errors[-2]
