@@ -10,9 +10,9 @@ class PolynomialRegression():
     n: int
         Number of samples in the input data.
     mean: numpy.ndarray 
-        Mean of each feature in the input data, of shape (n_features,).
+        Mean of each feature in the input data, of shape (n_features * max_power,).
     std: numpy.ndarray 
-        Standard deviation of each feature in the input data, of shape (n_features,)
+        Standard deviation of each feature in the input data, of shape (n_features * max_power,)
     beta: numpy.ndarray
         Coefficients of the polynomial regression model, of shape (n_features * max_power, 1)
     bias: float
@@ -40,23 +40,20 @@ class PolynomialRegression():
         self.max_power = max_power
 
     def _preprocess(self, x):
-        """Normalizes input data x, before generating additional polynomial terms
-        The number of additional terms generated are based on the class attribute 'max_power'
+        """Generates additional polynomial terms, based on the attribute 'max_power'
         
         Parameters:
         -----------
         x: numpy.ndarray
             Input data with shape (n_samples, n_features).
         """
-
-        # normalizing
-        x = (x - self.mean)/self.std
         
         # adding additional terms based on polynomial type initialized
         y = np.array(x)
         for i in range(1, self.max_power):
             y = np.hstack((y, x**(i + 1)))
         return y
+        
 
     def predict(self,  x, preproc = True):
         """Predicts the output of the trained polynomial regression model given the input data.
@@ -81,7 +78,9 @@ class PolynomialRegression():
 
         if self.n is None:
             raise ValueError("Need to fit model to data before predicting")
-        if preproc == True: x = self._preprocess(x) 
+        if preproc == True:
+            x = self._preprocess(x)
+            x = (x - self.mean)/self.std
         return np.matmul(x, self.beta) + self.bias
     
     def fit(self, x, y, lamda = 1, l_rate = 0.1, epochs = 1e4, rel_stop = 1e-5):
@@ -119,9 +118,10 @@ class PolynomialRegression():
         self.errors = []
         
         # normalizing and preparing
+        x = self._preprocess(x)
         self.mean = np.mean(x, axis = 0)
         self.std = np.std(x, axis = 0)
-        x = self._preprocess(x)
+        x = (x - self.mean)/self.std
         
         # loop for a maximum of 'epochs' times
         for i in range(int(epochs)):

@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # use the same training data to fit a linear regression model
     print("Fitting training data to a linear regression model:")
-    beta, bias, lin_errors = lr_fit(features, labels, l_rate = 1e-5)
+    beta, bias, lin_errors = lr_fit(features, labels, l_rate = 1e-5, rel_stop = 1e-5)
     print("")
 
     # initialize polynomial regression with quadratic leading term
@@ -37,13 +37,13 @@ if __name__ == "__main__":
 
     # fit model to training data using appropriate learning rate and regularization
     print("Fitting training data to a polynomial regression model:")
-    p_beta, p_bias, pr_errors = pr.fit(features, labels, l_rate = 0.03, lamda = 2)
+    p_beta, p_bias, pr_errors = pr.fit(features, labels, l_rate = 0.01, lamda = 1, rel_stop = 1e-5)
     print("")
 
     print("{} model fitted more closely to the training set with a lower mean squared error"\
           .format("Linear Regression" if pr_errors[-1] > lin_errors[-1] else "Polynomial Regression"))
     print("Linear Regression MSE: ", lin_errors[-1])
-    print("Polynomial Regression MSE: ", pr_errors[-1])
+    print("Polynomial Regression with regularization MSE: ", pr_errors[-1])
     print("")
 
     # load testing data similarly to evaluate trained models
@@ -76,10 +76,10 @@ if __name__ == "__main__":
 
     # Plotting the results of both the models
     plt.title("Regression Models Comparison")
-    plt.plot(x_s, y_lin, "b-")
-    plt.plot(x_s, y_pr,"r-")
+    plt.plot(x_s, y_lin, "bx")
+    plt.plot(x_s, y_pr,"rx")
     plt.plot(x_s, x_s, "y--")
-    plt.legend(("Linear Regression", "Polynomial Regression", "Baseline"))
+    plt.legend(("Linear Regression", "Polynomial Regression", "Baseline Truth"))
     plt.xlabel("True BicepC")
     plt.ylabel("Predicted BicepC")
     plt.show()
